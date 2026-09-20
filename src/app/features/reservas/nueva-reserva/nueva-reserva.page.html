@@ -1,0 +1,159 @@
+@if (cargando()) {
+  <div class="centrado">
+    <mat-spinner />
+  </div>
+} @else if (turnoCreado()) {
+  <!-- Paso 6: confirmación -->
+  <mat-card class="confirmacion">
+    <mat-card-header>
+      <mat-icon matCardAvatar class="ok-icon">check_circle</mat-icon>
+      <mat-card-title>¡Turno reservado!</mat-card-title>
+      <mat-card-subtitle>Tu código de turno es</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="codigo">#{{ turnoCreado()!.codigo }}</div>
+      <mat-divider class="sep"></mat-divider>
+      <dl class="resumen">
+        <div><dt>Servicio</dt><dd>{{ turnoCreado()!.servicioNombre }}</dd></div>
+        <div><dt>Profesional</dt><dd>{{ turnoCreado()!.profesionalNombre }}</dd></div>
+        <div><dt>Fecha</dt><dd>{{ turnoCreado()!.fechaHoraInicio | date: 'fullDate' }}</dd></div>
+        <div><dt>Horario</dt><dd>{{ turnoCreado()!.fechaHoraInicio | date: 'shortTime' }} – {{ turnoCreado()!.fechaHoraFin | date: 'shortTime' }}</dd></div>
+        <div><dt>Precio</dt><dd>{{ turnoCreado()!.precioAplicado | currency: 'ARS' }}</dd></div>
+        <div>
+          <dt>Estado</dt>
+          <dd><app-estado-badge [estado]="turnoCreado()!.estado" /></dd>
+        </div>
+      </dl>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button mat-flat-button color="primary" (click)="reiniciar()">
+        <mat-icon>add</mat-icon> Reservar otro turno
+      </button>
+    </mat-card-actions>
+  </mat-card>
+} @else {
+  <mat-stepper orientation="horizontal" (selectionChange)="onStepperCambio($event)">
+    <!-- Paso 1: servicio -->
+    <mat-step [completed]="paso1Completo()" label="Servicio">
+      <mat-radio-group class="servicios-grid" [value]="servicioId()" (change)="servicioId.set($event.value); onServicioSeleccionado()">
+        @for (s of servicios(); track s.id) {
+          <mat-radio-button [value]="s.id" class="servicio-card">
+            <div class="servicio-body">
+              <span class="servicio-nombre">{{ s.nombre }}</span>
+              <span class="servicio-desc">{{ s.descripcion }}</span>
+              <span class="servicio-meta">
+                {{ s.duracionMin }} min · {{ s.precio | currency: 'ARS' }} · {{ s.categoria }}
+              </span>
+            </div>
+          </mat-radio-button>
+        }
+      </mat-radio-group>
+    </mat-step>
+
+    <!-- Paso 2: profesional y fecha -->
+    <mat-step [completed]="paso2Completo()" label="Profesional y fecha">
+      <h3>2. ¿Con quién querés turno?</h3>
+      <mat-radio-group
+        class="profesional-options"
+        [value]="modoProfesional()"
+        (change)="modoProfesional.set($event.value); onModoOProfesionalCambio()"
+      >
+        <mat-radio-button [value]="'primero'">Primero disponible</mat-radio-button>
+        @for (p of profesionalesCapaces(); track p.id) {
+          <mat-radio-button [value]="p.id">{{ p.nombre }} {{ p.apellido }}
+            @if (p.especialidad) { <span class="hint">({{ p.especialidad }})</span> }
+          </mat-radio-button>
+        }
+      </mat-radio-group>
+
+      @if (profesionalElegido()) {
+        <div class="prof-info">
+          <mat-icon>info</mat-icon>
+          <span>Solo se mostrarán días/horarios en que {{ profesionalElegido()!.nombre }} atienda y esté libre.</span>
+        </div>
+      }
+
+      <h3 style="margin-top: 24px">Elegí el día</h3>
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha</mat-label>
+        <input matInput [matDatepicker]="picker" [min]="minFecha" [max]="maxFecha" [matDatepickerFilter]="filtrarFecha"
+          [value]="fechaDate()" (dateChange)="fechaDate.set($event.value); onFechaCambio()" />
+        <mat-hint>@if (cargandoDias()) { Calculando días con turnos… }</mat-hint>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </mat-step>
+
+    <!-- Paso 3: hora -->
+    <mat-step [completed]="paso3Completo()" label="Horario">
+      @if (cargandoSlots()) {
+        <div class="centrado"><mat-spinner diameter="32" /></div>
+      } @else if (!resultado() || resultado()!.slots.length === 0) {
+        <p class="sin-slots">
+          <mat-icon>event_busy</mat-icon>
+          No hay horarios disponibles para el día elegido. Probá con otra fecha.
+        </p>
+      } @else {
+        <div class="slots-grid">
+          @for (slot of resultado()!.slots; track slot.horaInicio) {
+            <button
+              mat-button
+              class="slot-btn"
+              [class.seleccionado]="horaSeleccionada() === slot.horaInicio"
+              (click)="horaSeleccionada.set(slot.horaInicio)"
+            >
+              <span class="slot-hora">{{ slot.horaInicio }} – {{ slot.horaFin }}</span>
+              @if (modoProfesional() === 'primero') {
+                <span class="slot-prof">{{ nombresDe(slot.profesionales) }}</span>
+              }
+            </button>
+          }
+        </div>
+        <mat-hint>* Se muestra el horario de inicio; la duración es de {{ servicio()!.duracionMin }} min.</mat-hint>
+      }
+    </mat-step>
+
+    <!-- Paso 4: confirmación -->
+    <mat-step [completed]="paso4Completo()" label="Confirmar">
+      @if (esGestor()) {
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Cliente</mat-label>
+          <mat-select [value]="clienteSeleccionadoId()" (selectionChange)="clienteSeleccionadoId.set($event.value)">
+            @for (c of clientes(); track c.id) {
+              <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      }
+
+      <dl class="resumen">
+        <div><dt>Servicio</dt><dd>{{ servicio()!.nombre }}</dd></div>
+        <div>
+          <dt>Profesional</dt>
+          <dd>
+            @if (modoProfesional() === 'primero') {
+              {{ nombresDe(slotElegido()?.profesionales ?? []) }}
+            } @else {
+              {{ profesionalElegido()?.nombre }} {{ profesionalElegido()?.apellido }}
+            }
+          </dd>
+        </div>
+        <div><dt>Fecha</dt><dd>{{ fecha() | date: 'fullDate' }}</dd></div>
+        <div><dt>Horario</dt><dd>{{ horaSeleccionada() }} – {{ slotElegido()?.horaFin }}</dd></div>
+        <div><dt>Precio</dt><dd>{{ servicio()!.precio | currency: 'ARS' }}</dd></div>
+      </dl>
+
+      <mat-checkbox [checked]="true" disabled>Confirmar mi asistencia (política de cancelación: hasta 4&nbsp;h antes)</mat-checkbox>
+
+      <div class="confirm-actions">
+        <button mat-flat-button color="primary" [disabled]="creando()" (click)="confirmarTurno()">
+          @if (creando()) {
+            <mat-spinner diameter="20" />
+          } @else {
+            Confirmar turno
+          }
+        </button>
+      </div>
+    </mat-step>
+  </mat-stepper>
+}

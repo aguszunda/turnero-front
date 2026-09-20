@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>Cancelar turno</h2>
+<mat-dialog-content>
+  <p class="aviso">⚠️ La cancelación libera el cupo de inmediato. La política permite cancelar hasta 4&nbsp;horas antes del turno.</p>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Motivo de cancelación</mat-label>
+      <mat-select formControlName="motivo">
+        @for (r of razones; track r) {
+          <mat-option [value]="r">{{ r }}</mat-option>
+        }
+      </mat-select>
+      @if (form.controls.motivo.hasError('required')) {
+        <mat-error>Elegí un motivo</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Detalle (opcional)</mat-label>
+      <textarea matInput formControlName="detalle" rows="2"></textarea>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Volver</button>
+  <button mat-flat-button color="warn" [disabled]="form.invalid || guardando()" (click)="confirmar()">Cancelar turno</button>
+</mat-dialog-actions>

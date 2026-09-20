@@ -1,0 +1,65 @@
+<div class="editor">
+  @for (dia of dias; track dia) {
+    <div class="dia-row" [class.dia-activo]="activo(dia)">
+      <mat-slide-toggle
+        [checked]="activo(dia)"
+        (toggleChange)="toggleDia(dia)"
+        aria-label="Día laboral"
+      >
+        <strong>{{ nombreDia(dia) }}</strong>
+      </mat-slide-toggle>
+
+      @if (activo(dia)) {
+        <div class="franja">
+          <mat-form-field appearance="outline" class="time-field">
+            <mat-label>Entrada</mat-label>
+            <input
+              matInput
+              type="time"
+              [value]="horarioDe(dia)!.horaInicio"
+              (change)="actualizar(dia, 'horaInicio', valueDelEvento($event))"
+            />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="time-field">
+            <mat-label>Salida</mat-label>
+            <input
+              matInput
+              type="time"
+              [value]="horarioDe(dia)!.horaFin"
+              (change)="actualizar(dia, 'horaFin', valueDelEvento($event))"
+            />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="time-field">
+            <mat-label>Descanso desde</mat-label>
+            <input
+              matInput
+              type="time"
+              [value]="horarioDe(dia)!.inicioDescanso ?? ''"
+              (change)="actualizar(dia, 'inicioDescanso', valueDelEvento($event))"
+            />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="time-field">
+            <mat-label>Descanso hasta</mat-label>
+            <input
+              matInput
+              type="time"
+              [value]="horarioDe(dia)!.finDescanso ?? ''"
+              (change)="actualizar(dia, 'finDescanso', valueDelEvento($event))"
+            />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="time-field margen">
+            <mat-label>Margen (min)</mat-label>
+            <input
+              matInput
+              type="number"
+              min="0"
+              max="60"
+              [value]="horarioDe(dia)!.margenMin"
+              (change)="actualizar(dia, 'margenMin', margenDelEvento($event))"
+            />
+          </mat-form-field>
+        </div>
+      }
+    </div>
+  }
+</div>

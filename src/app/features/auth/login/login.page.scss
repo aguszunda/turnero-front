@@ -1,0 +1,52 @@
+.login-container {
+  display: grid;
+  gap: 24px;
+  justify-content: center;
+  padding: 48px 16px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+}
+
+.full-width {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+
+  button[type='submit'] {
+    min-width: 140px;
+  }
+}
+
+mat-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+}
+
+.demo-card {
+  width: 100%;
+  max-width: 440px;
+}
+
+.demo-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+
+  span {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}

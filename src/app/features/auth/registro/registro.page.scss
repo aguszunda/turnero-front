@@ -1,0 +1,46 @@
+.registro-container {
+  display: flex;
+  justify-content: center;
+  padding: 48px 16px;
+}
+
+.registro-card {
+  width: 100%;
+  max-width: 520px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.full-width {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+
+  button[type='submit'] {
+    min-width: 160px;
+  }
+}
+
+mat-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+}
+
+@media (max-width: 480px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

@@ -1,0 +1,60 @@
+<div class="page">
+  <header class="page-header">
+    <h1>Mis turnos</h1>
+    <a mat-raised-button color="primary" routerLink="/reservas">
+      <mat-icon>add</mat-icon> Reservar turno
+    </a>
+  </header>
+
+  @if (cargando()) {
+    <div class="centrado"><mat-spinner /></div>
+  } @else if (turnos().length === 0) {
+    <mat-card appearance="outlined" class="empty">
+      <mat-icon>event_available</mat-icon>
+      <p>No tenés turnos todavía. ¡Reservá tu primer corte!</p>
+      <a mat-flat-button routerLink="/reservas">Reservar</a>
+    </mat-card>
+  } @else {
+    <div class="turnos-list">
+      @for (t of turnos(); track t.id) {
+        <mat-card appearance="outlined" class="turno-card">
+          <div class="turno-fecha">
+            <span class="fecha-dia">{{ t.fechaHoraInicio | date: 'd' }}</span>
+            <span class="fecha-mes">{{ t.fechaHoraInicio | date: 'MMMM' }}</span>
+          </div>
+          <div class="turno-body">
+            <div class="turno-titulo">
+              <strong>{{ t.servicioNombre }}</strong>
+              <app-estado-badge [estado]="t.estado" />
+            </div>
+            <div class="turno-detalle">
+              <span><mat-icon>person</mat-icon> {{ t.profesionalNombre }}</span>
+              <span><mat-icon>schedule</mat-icon> {{ t.fechaHoraInicio | date: 'fullDate' }} {{ t.fechaHoraInicio | date: 'shortTime' }} – {{ t.fechaHoraFin | date: 'shortTime' }}</span>
+              <span><mat-icon>payments</mat-icon> {{ t.precioAplicado | currency: 'ARS' }}</span>
+              @if (t.codigo) {
+                <span class="codigo">#{{ t.codigo }}</span>
+              }
+            </div>
+          </div>
+          <div class="turno-acciones">
+            @if (["pendiente", "reservado"].includes(t.estado) && !esPasado(t)) {
+              <button mat-stroked-button [disabled]="accionTurnoId() === t.id" (click)="reprogramarTurno(t)">
+                Reprogramar
+              </button>
+            }
+            @if (puedeCancelar(t)) {
+              <button mat-flat-button color="warn" [disabled]="accionTurnoId() === t.id" (click)="cancelarTurno(t)">
+                Cancelar
+              </button>
+            }
+            @if (t.estado === 'cancelado' && t.motivoCancelacion) {
+              <span class="motivo" title="{{ t.motivoCancelacion }}">
+                <mat-icon>info</mat-icon> {{ t.motivoCancelacion }}
+              </span>
+            }
+          </div>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,21 @@
+.estado-badge {
+  --color: #6b7280;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  background: color-mix(in srgb, var(--color) 14%, transparent);
+  color: var(--color);
+
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color);
+  }
+}

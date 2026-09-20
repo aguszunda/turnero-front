@@ -1,0 +1,100 @@
+<h2 mat-dialog-title>{{ esEdicion ? 'Editar profesional' : 'Nuevo profesional' }}</h2>
+<mat-dialog-content>
+  @if (cargandoServicios()) {
+    <div class="centrado"><mat-spinner diameter="32" /></div>
+  } @else {
+    <mat-tab-group>
+      <mat-tab label="Datos personales">
+        <form [formGroup]="form" class="tab-body">
+          <div class="row">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre *</mat-label>
+              <input matInput formControlName="nombre" />
+              @if (form.controls.nombre.hasError('required')) {
+                <mat-error>Requerido</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Apellido *</mat-label>
+              <input matInput formControlName="apellido" />
+              @if (form.controls.apellido.hasError('required')) {
+                <mat-error>Requerido</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="row">
+            <mat-form-field appearance="outline">
+              <mat-label>Email *</mat-label>
+              <input matInput formControlName="email" type="email" />
+              @if (form.controls.email.hasError('required')) {
+                <mat-error>Requerido</mat-error>
+              } @else if (form.controls.email.hasError('email')) {
+                <mat-error>Email inválido</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Teléfono *</mat-label>
+              <input matInput formControlName="telefono" />
+              @if (form.controls.telefono.hasError('required')) {
+                <mat-error>Requerido</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Especialidad</mat-label>
+            <input matInput formControlName="especialidad" placeholder="Ej.: Colorimetría" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Bio</mat-label>
+            <textarea matInput formControlName="bio" rows="2"></textarea>
+          </mat-form-field>
+        </form>
+      </mat-tab>
+
+      <mat-tab label="Servicios">
+        <div class="tab-body">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Servicios que presta *</mat-label>
+            <mat-select formControlName="servicioIds" multiple>
+              @for (s of servicios(); track s.id) {
+                <mat-option [value]="s.id">{{ s.nombre }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.servicioIds.hasError('required')) {
+              <mat-error>Asigná al menos un servicio</mat-error>
+            }
+          </mat-form-field>
+          <p class="aviso">
+            Un profesional solo puede ser reservado con los servicios que presta (regla de negocio del sistema).
+          </p>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Horarios">
+        <div class="tab-body">
+          <app-horario-editor
+            [profesionalId]="profesional?.id ?? 0"
+            [horarios]="horarios()"
+            (cambio)="onHorariosCambio($event)"
+          />
+          <p class="aviso">
+            Activá los días laborales y definí hora de entrada/salida, descanso (no reservable) y margen entre turnos.
+          </p>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-flat-button color="primary" [disabled]="form.invalid || cargandoServicios() || guardando()" (click)="guardar()">
+    @if (guardando()) {
+      <mat-spinner diameter="18" />
+    } @else {
+      {{ esEdicion ? 'Guardar cambios' : 'Crear profesional' }}
+    }
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,46 @@
+.editor {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.dia-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 10px;
+
+  &.dia-activo {
+    border-color: var(--mat-sys-primary);
+    background: var(--mat-sys-surface-container-lowest);
+  }
+}
+
+.franja {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(90px, 1fr));
+  gap: 8px;
+  align-items: start;
+
+  .time-field {
+    max-width: 130px;
+  }
+
+  .margen {
+    max-width: 110px;
+  }
+}
+
+@media (max-width: 760px) {
+  .dia-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .franja {
+    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  }
+}

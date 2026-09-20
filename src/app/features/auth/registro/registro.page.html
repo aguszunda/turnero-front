@@ -1,0 +1,99 @@
+<div class="registro-container">
+  <mat-card class="registro-card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Crear cuenta de cliente</mat-card-title>
+      <mat-card-subtitle>Para reservar y gestionar tus turnos</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" autocomplete="given-name" />
+            @if (form.controls.nombre.hasError('required')) {
+              <mat-error>Requerido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="apellido" autocomplete="family-name" />
+            @if (form.controls.apellido.hasError('required')) {
+              <mat-error>Requerido</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" autocomplete="email" />
+          @if (form.controls.email.hasError('required')) {
+            <mat-error>Requerido</mat-error>
+          } @else if (form.controls.email.hasError('email')) {
+            <mat-error>Email inválido</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Teléfono</mat-label>
+          <input matInput formControlName="telefono" autocomplete="tel" />
+          @if (form.controls.telefono.hasError('required')) {
+            <mat-error>Requerido</mat-error>
+          } @else if (form.controls.telefono.hasError('pattern')) {
+            <mat-error>Teléfono inválido</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input
+            matInput
+            formControlName="password"
+            [type]="mostrarPassword() ? 'text' : 'password'"
+            autocomplete="new-password"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            aria-label="Mostrar contraseña"
+            (click)="mostrarPassword.set(!mostrarPassword())"
+          >
+            <mat-icon>{{ mostrarPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (form.controls.password.hasError('required')) {
+            <mat-error>Requerida</mat-error>
+          } @else if (form.controls.password.hasError('minlength')) {
+            <mat-error>Mínimo 6 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirmar contraseña</mat-label>
+          <input matInput formControlName="confirmar" type="password" autocomplete="new-password" />
+          @if (form.controls.confirmar.hasError('required')) {
+            <mat-error>Requerida</mat-error>
+          } @else if (form.hasError('passwords')) {
+            <mat-error>Las contraseñas no coinciden</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="loading()">
+            @if (loading()) {
+              <mat-spinner diameter="20" />
+            } @else {
+              Registrarme
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <span>¿Ya tenés cuenta?</span>
+      <a mat-button routerLink="/login">Ingresar</a>
+    </mat-card-actions>
+  </mat-card>
+</div>

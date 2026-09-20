@@ -1,0 +1,30 @@
+.info {
+  margin-top: 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.centrado {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  padding-top: 4px;
+
+  button.seleccionado {
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+    border-color: var(--mat-sys-primary);
+  }
+}
+
+.sin-slots {
+  color: var(--mat-sys-on-surface-variant);
+}

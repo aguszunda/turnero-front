@@ -1,0 +1,74 @@
+<div class="login-container">
+  <mat-card class="login-card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Iniciar sesión</mat-card-title>
+      <mat-card-subtitle>Bienvenido al sistema de turnos 💈</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" autocomplete="username" />
+          @if (form.controls.email.hasError('required')) {
+            <mat-error>El email es requerido</mat-error>
+          } @else if (form.controls.email.hasError('email')) {
+            <mat-error>Ingresá un email válido</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input
+            matInput
+            formControlName="password"
+            [type]="mostrarPassword() ? 'text' : 'password'"
+            autocomplete="current-password"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            aria-label="Mostrar contraseña"
+            (click)="mostrarPassword.set(!mostrarPassword())"
+          >
+            <mat-icon>{{ mostrarPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (form.controls.password.hasError('required')) {
+            <mat-error>La contraseña es requerida</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="loading()">
+            @if (loading()) {
+              <mat-spinner diameter="20" />
+            } @else {
+              Ingresar
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <span>¿No tenés cuenta?</span>
+      <a mat-button routerLink="/registro">Registrate</a>
+    </mat-card-actions>
+  </mat-card>
+
+  <mat-card class="demo-card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Cuentas de demostración</mat-card-title>
+      <mat-card-subtitle>(modo mock — backend no conectado)</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      @for (a of cuentasDemo; track a.email) {
+        <button mat-stroked-button (click)="autocompletar(a.email, a.pass)" class="demo-row">
+          <strong>{{ a.rol }}</strong>
+          <span>{{ a.email }} · {{ a.pass }}</span>
+        </button>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

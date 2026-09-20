@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>Reprogramar turno</h2>
+<mat-dialog-content>
+  <p class="info">
+    Turno <strong>#{{ turno.codigo }}</strong> · {{ turno.servicioNombre }} con {{ turno.profesionalNombre }}
+  </p>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Nueva fecha</mat-label>
+    <input matInput [matDatepicker]="picker" [min]="minFecha" [max]="maxFecha"
+      [value]="fechaDate()" (dateChange)="fechaDate.set($event.value); onFecha()" />
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+
+  @if (cargando()) {
+    <div class="centrado"><mat-spinner diameter="28" /></div>
+  } @else if (resultado() && resultado()!.slots.length > 0) {
+    <div class="slots">
+      @for (slot of resultado()!.slots; track slot.horaInicio) {
+        <button
+          mat-stroked-button
+          [class.seleccionado]="horaSeleccionada() === slot.horaInicio"
+          (click)="horaSeleccionada.set(slot.horaInicio)"
+        >
+          {{ slot.horaInicio }} – {{ slot.horaFin }}
+        </button>
+      }
+    </div>
+  } @else if (resultado()) {
+    <p class="sin-slots">No hay horarios disponibles para esa fecha con {{ turno.profesionalNombre }}.</p>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Volver</button>
+  <button mat-flat-button color="primary" [disabled]="!horaSeleccionada()" (click)="confirmar()">Confirmar nuevo horario</button>
+</mat-dialog-actions>

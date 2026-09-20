@@ -1,0 +1,60 @@
+<div class="page">
+  <header class="page-header">
+    <h1>Servicios</h1>
+    <button mat-raised-button color="primary" (click)="abrirForm()">
+      <mat-icon>add</mat-icon> Nuevo servicio
+    </button>
+  </header>
+
+  @if (cargando()) {
+    <div class="centrado"><mat-spinner /></div>
+  } @else {
+    <mat-card appearance="outlined">
+      <table mat-table [dataSource]="servicios()">
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef>Servicio</th>
+          <td mat-cell *matCellDef="let s">
+            <strong>{{ s.nombre }}</strong>
+            @if (s.descripcion) {
+              <small>{{ s.descripcion }}</small>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="servicioCategoria">
+          <th mat-header-cell *matHeaderCellDef>Categoría</th>
+          <td mat-cell *matCellDef="let s">{{ categoriaDe(s.categoria) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="duracion">
+          <th mat-header-cell *matHeaderCellDef>Duración</th>
+          <td mat-cell *matCellDef="let s">{{ s.duracionMin }} min</td>
+        </ng-container>
+
+        <ng-container matColumnDef="precio">
+          <th mat-header-cell *matHeaderCellDef>Precio</th>
+          <td mat-cell *matCellDef="let s">{{ s.precio | currency: 'ARS' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="activo">
+          <th mat-header-cell *matHeaderCellDef>Activo</th>
+          <td mat-cell *matCellDef="let s">
+            <mat-slide-toggle [checked]="s.activo" (toggleChange)="toggleActivo(s)" aria-label="Activar/inactivar servicio"></mat-slide-toggle>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let s">
+            <button mat-icon-button aria-label="Editar" (click)="abrirForm(false, s)">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+      </table>
+    </mat-card>
+  }
+</div>
